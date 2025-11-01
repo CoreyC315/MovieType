@@ -1,9 +1,9 @@
 export interface IMovie {
-    code: number;
-    name: string
-    genre: string;
-    year: number;
-    
+  id: number;
+  code: string;
+  name: string;
+  genre: string;
+  year: number;
 }
 
-export let test: number
+export let test: number;
