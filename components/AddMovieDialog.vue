@@ -47,7 +47,7 @@ const handleAddMovie = () => {
     header="Add a movie!"
     :style="{ width: '25rem' }"
   >
-    <!-- This layout uses flex-col for nice spacing -->
+    <!-- This layout uses flex-col for spacing -->
     <div class="flex flex-col gap-3">
       <div>
         <InputText
@@ -66,7 +66,6 @@ const handleAddMovie = () => {
         />
       </div>
       <div>
-        <!-- Note: This is still 'text' type. The server will convert it. -->
         <InputText
           type="text"
           v-model="movieData.year"
@@ -83,7 +82,7 @@ const handleAddMovie = () => {
         />
       </div>
       <div>
-        <!-- This button now triggers our handleAddMovie function -->
+        <!-- This button triggers the handleAddMovie function -->
         <Button class="bg-blue-500 p-4 w-full" @click="handleAddMovie">
           Add Movie
         </Button>
