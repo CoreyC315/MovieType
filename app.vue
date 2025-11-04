@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen">
-    <div class="h-1/2 bg-gray-500 text-center flex flex-col items-center">
+    <div class="h-1/2 bg-white text-center flex flex-col items-center">
       <h1
         class="rounded-lg bg-green-500 p-4 shadow-md border-2 border-black-500 mb-4"
       >
@@ -8,7 +8,7 @@
       </h1>
 
       <Button
-        class="bg-blue-500 p-4"
+        class="bg-blue-500 p-4 shadow-2xl shadow-gray-800 border-2 border-black mb-4"
         label="Add Movie"
         @click="addVisible = true"
       />
@@ -21,12 +21,12 @@
 
     <div class="card">
       <div v-if="pending">Loading movies...</div>
-      <MovieTable v-else :movies="movies" />
+      <MovieTable v-else :movies="movies" @editMovie="openEditDialog" />
     </div>
   </div>
 
   <!-- 
-    Here we LISTEN for the @addMovie event from the dialog
+    Here we listen for the @addMovie event from the dialog
     and tell it to run our 'handleAddNewMovie' function.
   -->
   <AddMovieDialog v-model:visible="addVisible" @addMovie="handleAddNewMovie" />
@@ -34,6 +34,12 @@
   <DeleteMovieDialog
     v-model:visible="deleteVisible"
     @deleteMovie="handleDeleteMovie"
+  />
+
+  <EditMovieDialog
+    v-model:visible="editVisible"
+    :movie="movieToEdit"
+    @updateMovie="handleUpdateMovie"
   />
 </template>
 
@@ -44,11 +50,15 @@ import Button from "primevue/button";
 import type { IMovie } from "~/types/movieTypes";
 
 import DeleteMovieDialog from "./components/DeleteMovieDialog.vue";
+import EditMovieDialog from "./components/EditMovieDialog.vue";
 
 // For the add button ref to show up
 const addVisible = ref(false);
 // This is for the delete button ref to show up
 const deleteVisible = ref(false);
+
+const editVisible = ref(false);
+const movieToEdit = ref<IMovie | null>(null);
 
 // 1. This is to get the movies from the database. Makes a get request
 // it is called refresh because when movies are added or deleted we refresh to get the new list of movies
@@ -56,12 +66,12 @@ const {
   data: movies,
   pending,
   refresh,
-} = await useAsyncData<IMovie[]>("movies", () => $fetch("/api/movies/"));
+} = await useAsyncData<IMovie[]>("movies", () => $fetch("/api/movies"));
 
 // 2. This function is called when the dialog emits "addMovie"
 async function handleAddNewMovie(newMovieData: Omit<IMovie, "id">) {
   // 1. Call your new POST API endpoint
-  await $fetch("/api/movies/", {
+  await $fetch("/api/movies", {
     method: "post",
     body: newMovieData,
   });
@@ -70,13 +80,31 @@ async function handleAddNewMovie(newMovieData: Omit<IMovie, "id">) {
   await refresh();
 }
 
-//4. Delete function is called when dialog emits 'deleteMovie'
+function openEditDialog(movie: IMovie) {
+  movieToEdit.value = movie; // Store the movie to be edited
+  editVisible.value = true; // Open the dialog
+}
+
+//3. Delete function is called when dialog emits 'deleteMovie'
 async function handleDeleteMovie(movieCode: string) {
   //1. Call the delete API endpoint
   await $fetch(`/api/movies/${movieCode}`, {
     method: "delete",
   });
   //2. Call refresh to re-fetch the movie list
+  await refresh();
+}
+
+// 4. NEW: Function to handle the update
+async function handleUpdateMovie(movieData: IMovie) {
+  // Use the movie's code to build the URL
+  await $fetch(`/api/movies/${movieData.code}`, {
+    method: "put",
+    body: movieData, // Send the updated data
+  });
+
+  // Hide the dialog and refresh the list
+  editVisible.value = false;
   await refresh();
 }
 </script>

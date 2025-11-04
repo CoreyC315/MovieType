@@ -7,18 +7,23 @@ import type {
   DataTableRowUnselectEvent,
 } from "primevue/datatable";
 import { ref } from "vue";
+// 1. Import Button for your new edit button
+import Button from "primevue/button";
 
 //types from types folder
 import type { IMovie } from "~/types/movieTypes";
 
-//1. Define the 'movies' prop that will recieve from the parent
+//2. Define the 'movies' prop that will recieve from the parent
 const props = defineProps<{
   movies: IMovie[] | null | undefined;
 }>();
 
+// 3. Define the 'editMovie' event it can SEND to the parent
+const emit = defineEmits(["editMovie"]);
+
 const selectedMovie = ref<IMovie>();
 
-//2. All selection logic in this
+//4. All selection logic in this
 //for when you select a row
 const onRowSelect = (event: DataTableRowSelectEvent) => {
   console.log("Row Selected:", event.data.name);
@@ -27,6 +32,11 @@ const onRowSelect = (event: DataTableRowSelectEvent) => {
 //when you unselect the row.
 const onRowUnselect = (event: DataTableRowUnselectEvent) => {
   console.log("Row Unselected:", event.data.name);
+};
+
+// 5. Create a function to emit the movie data when edit is clicked
+const onEditClick = (movie: IMovie) => {
+  emit("editMovie", movie);
 };
 </script>
 
@@ -45,6 +55,16 @@ const onRowUnselect = (event: DataTableRowUnselectEvent) => {
       <Column field="name" header="Movie Name"></Column>
       <Column field="genre" header="Genre"></Column>
       <Column field="year" header="Year"></Column>
+
+      <Column header="Edit">
+        <template #body="slotProps">
+          <Button
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success"
+            @click="onEditClick(slotProps.data)"
+          />
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
