@@ -1,27 +1,23 @@
 <template>
-  <div class="h-screen">
-    <div class="h-1/2 bg-white text-center flex flex-col items-center">
-      <h1
-        class="rounded-lg bg-green-500 p-4 shadow-md border-2 border-black-500 mb-4"
-      >
+  <div class="h-auto">
+    <div class="h-64 bg-indigo-300 text-center flex flex-col items-center p-5">
+      <h1 class="h-min bg-blue-600 text-center rounded-full flex flex-col p-4">
         My Movie WatchList
       </h1>
-
-      <Button
-        class="bg-blue-500 p-4 shadow-2xl shadow-gray-800 border-2 border-black mb-4"
-        label="Add Movie"
-        @click="addVisible = true"
-      />
-      <Button
-        class="bg-red-500 p-4"
-        label="Delete Movie"
-        @click="deleteVisible = true"
-      />
+      <div class="flex flex-col gap-5 my-5">
+        <Button label="Add Movie" @click="addVisible = true" />
+        <Button label="Delete Movie" @click="deleteVisible = true" />
+      </div>
     </div>
 
-    <div class="card">
+    <div class="card max-w-4xl mx-auto mt-20 bg-white rounded-lg shadow-lg">
       <div v-if="pending">Loading movies...</div>
-      <MovieTable v-else :movies="movies" @editMovie="openEditDialog" />
+      <MovieTable
+        class=""
+        v-else
+        :movies="movies"
+        @editMovie="openEditDialog"
+      />
     </div>
   </div>
 
@@ -88,7 +84,7 @@ function openEditDialog(movie: IMovie) {
 //3. Delete function is called when dialog emits 'deleteMovie'
 async function handleDeleteMovie(movieCode: string) {
   //1. Call the delete API endpoint
-  await $fetch(`/api/movies/${movieCode}`, {
+  await $fetch(`/api/movies/${movieCode}` as string, {
     method: "delete",
   });
   //2. Call refresh to re-fetch the movie list
@@ -98,7 +94,7 @@ async function handleDeleteMovie(movieCode: string) {
 // 4. NEW: Function to handle the update
 async function handleUpdateMovie(movieData: IMovie) {
   // Use the movie's code to build the URL
-  await $fetch(`/api/movies/${movieData.code}`, {
+  await $fetch(`/api/movies/${movieData.code}` as string, {
     method: "put",
     body: movieData, // Send the updated data
   });
