@@ -20,4 +20,5 @@ model Movie {
   name  String
   genre String
   year  Int
+  description String?
 }

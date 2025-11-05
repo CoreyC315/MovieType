@@ -4,6 +4,7 @@ export interface IMovie {
   name: string;
   genre: string;
   year: number;
+  description: string;
 }
 
 export let test: number;

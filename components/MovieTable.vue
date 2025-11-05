@@ -43,6 +43,7 @@ const onEditClick = (movie: IMovie) => {
 <template>
   <div class="card">
     <DataTable
+      class=""
       :value="props.movies"
       @rowSelect="onRowSelect"
       @rowUnselect="onRowUnselect"
@@ -52,7 +53,18 @@ const onEditClick = (movie: IMovie) => {
       dataKey="code"
     >
       <Column field="code" header="Unique Code"></Column>
-      <Column field="name" header="Movie Name"></Column>
+
+      <Column field="name" header="Movie Name">
+        <template #body="slotProps">
+          <NuxtLink
+            :to="`/movies/${slotProps.data.code}`"
+            class="text-blue-600 hover:underline"
+          >
+            {{ slotProps.data.name }}
+          </NuxtLink>
+        </template>
+      </Column>
+
       <Column field="genre" header="Genre"></Column>
       <Column field="year" header="Year"></Column>
 
