@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import type { IMovie } from "~/types/movieTypes";
+import { ref } from "vue";
+import EditMovieDialog from "~/components/EditMovieDialog.vue";
 
 //1. Get the current route to access the URL parameters
 const route = useRoute();
@@ -8,14 +10,21 @@ const route = useRoute();
 //2. Get [code] from the URL
 const movieCode = route.params.code as string;
 
-//3. Fetch the API data
+const editVisible = ref(false);
+
+// --- PROBLEM 1 FIX: ---
+// You only need ONE useAsyncData call.
+// We need the 'refresh' function from it.
 const {
   data: movie,
   pending,
   error,
+  refresh,
 } = await useAsyncData<IMovie>(`movie-${movieCode}`, () =>
   $fetch(`/api/movies/${movieCode}`)
 );
+
+// (The duplicate useAsyncData call has been removed)
 
 //placeholder function for right now
 function addToList() {
@@ -23,6 +32,20 @@ function addToList() {
     alert(`Adding ${movie.value.name} to your list!`);
     //This is for when you want to add the movie to a watch list
   }
+}
+
+// --- PROBLEM 2 FIX: ---
+// The logic to close the dialog and refresh
+// MUST be INSIDE the function.
+async function handleUpdateMovie(movieData: IMovie) {
+  await $fetch(`/api/movies/${movieCode}`, {
+    method: "PUT", // <-- Good practice to use PUT
+    body: movieData,
+  });
+
+  // These lines were outside the function, now they are inside:
+  editVisible.value = false;
+  await refresh();
 }
 </script>
 
@@ -46,9 +69,23 @@ function addToList() {
       </h1>
       <p class="text-lg italic text-gray-700 mb-6">{{ movie.genre }}</p>
 
-      <p class="text-base mb-8">{{ movie.description }}</p>
+      <p v-if="movie.description" class="text-base mb-8">
+        {{ movie.description }}
+      </p>
+      <p v-else class="text-base mb-8 italic text-gray-500">
+        No description available.
+      </p>
 
-      <Button label="Add to My List" icon="pi pi-plus" @click="addToList" />
+      <div class="flex gap-4">
+        <Button label="Add to My List" icon="pi pi-plus" @click="addToList" />
+
+        <Button
+          label="Edit Details"
+          icon="pi pi-pencil"
+          @click="editVisible = true"
+          class="p-button-secondary"
+        />
+      </div>
 
       <hr class="my-8" />
 
@@ -57,4 +94,11 @@ function addToList() {
       >
     </article>
   </div>
+
+  <EditMovieDialog
+    v-if="movie"
+    v-model:visible="editVisible"
+    :movie="movie"
+    @updateMovie="handleUpdateMovie"
+  />
 </template>

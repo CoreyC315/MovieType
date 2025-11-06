@@ -4,6 +4,7 @@ import { reactive } from "vue";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
+import Textarea from "primevue/textarea";
 import type { IMovie } from "~/types/movieTypes";
 
 // 1. Use a single reactive object to hold all the form fields
@@ -13,6 +14,7 @@ const movieData = reactive({
   year: "",
   code: "",
   id: 0,
+  description: "",
 });
 
 // 2. Define the prop it RECEIVES from the parent
@@ -35,6 +37,7 @@ watchEffect(() => {
     movieData.genre = props.movie.genre;
     movieData.year = props.movie.year.toString();
     movieData.code = props.movie.code;
+    movieData.code = props.movie.description || "";
   }
 });
 
@@ -88,6 +91,14 @@ const handleUpdateMovie = () => {
           placeholder="Unique Code"
           class="w-full bg-gray-200"
           :disabled="true"
+        />
+      </div>
+      <div>
+        <Textarea
+          v-model="movieData.description"
+          placeholder="Description"
+          rows="5"
+          class="w-full"
         />
       </div>
       <div>

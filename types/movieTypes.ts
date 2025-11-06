@@ -4,7 +4,7 @@ export interface IMovie {
   name: string;
   genre: string;
   year: number;
-  description: string;
+  description: string | null;
 }
 
 export let test: number;

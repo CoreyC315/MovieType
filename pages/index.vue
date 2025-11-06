@@ -47,6 +47,7 @@ import type { IMovie } from "~/types/movieTypes";
 
 import DeleteMovieDialog from "~/components/DeleteMovieDialog.vue";
 import EditMovieDialog from "~/components/EditMovieDialog.vue";
+import "primeicons/primeicons.css";
 
 // For the add button ref to show up
 const addVisible = ref(false);

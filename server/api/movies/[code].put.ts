@@ -15,19 +15,27 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Movie code is required!",
     });
   }
+  try {
+    //3. Use 'prisma.movie.update'
+    const updateMovie = await prisma.movie.update({
+      where: {
+        code: code,
+      },
+      data: {
+        name: body.name,
+        genre: body.genre,
+        year: parseInt(body.year),
+        description: body.description,
+        //don't update the code so it stays unique
+      },
+    });
 
-  //3. Use 'prisma.movie.update'
-  const updateMovie = await prisma.movie.update({
-    where: {
-      code: code,
-    },
-    data: {
-      name: body.name,
-      genre: body.genre,
-      year: parseInt(body.year),
-      //don't update the code so it stays unique
-    },
-  });
-
-  return updateMovie;
+    return updateMovie;
+  } catch (error) {
+    console.error("Error updating movie:", error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Could not update movie",
+    });
+  }
 });
